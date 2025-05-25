@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 import tensorflow as tf
 import numpy as np
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
 
@@ -71,3 +72,5 @@ def get_all_destinations():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  # fallback ke 6000 jika PORT tidak ada
     app.run(host='0.0.0.0', port=port, debug=True)
+    
+CORS(app)
