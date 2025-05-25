@@ -69,5 +69,5 @@ def get_all_destinations():
     })
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 6000))  # fallback ke 6000 jika PORT tidak ada
+    port = int(os.environ.get('PORT', 8080))  # fallback ke 6000 jika PORT tidak ada
     app.run(host='0.0.0.0', port=port, debug=True)
