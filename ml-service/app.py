@@ -11,6 +11,12 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+MONGO_URI = os.getenv("MONGO_URI")
+
+# Koneksi ke MongoDB menggunakan URI dari .env
+client = MongoClient(MONGO_URI)
+db = client['test']
+collection = db['destinations']
 
 # Load model
 model = tf.keras.models.load_model('model_kota.h5')
@@ -74,46 +80,39 @@ def get_all_destinations():
         'destinations': all_data
     })
 
-MONGO_URI = os.getenv("MONGO_URI")
-
-# Koneksi ke MongoDB menggunakan URI dari .env
-client = MongoClient(MONGO_URI)
-db = client['test']
-collection = db['destinations']
-
-# Modified save_destinations function to store data into MongoDB using Mongoose model
 @app.route('/save_destinations', methods=['POST'])
 def save_destinations():
     data = request.json
     destinations = data.get('destinations', [])
-
+    
+    # Check if destinations data is not empty
     if not destinations:
         return jsonify({'error': 'No destinations data provided'}), 400
-
+    
     try:
-        # Loop through destinations and save each one using the Destination model
-        for dest in destinations:
-            # Create new destination document based on the model schema
-            destination_data = {
-                "name": dest.get('name'),
-                "location": dest.get('location'),
-                "facilities": dest.get('facilities', []),
-                "price": dest.get('price'),
-                "openingHours": dest.get('openingHours'),
-                "closingHours": dest.get('closingHours'),
-                "description": dest.get('description'),
-                "category": dest.get('category'),
-                "city": dest.get('city'),
-                "officialRating": dest.get('officialRating', 0),
-                "rating": dest.get('rating', 0),
-                "lat": dest.get('lat'),
-                "lon": dest.get('lon')
-            }
-            # Menyimpan ke MongoDB
-            collection.insert_one(destination_data)
+        # Prepare data for insertion (using list comprehension)
+        destination_data = [{
+            "name": dest.get('name'),
+            "location": dest.get('location'),
+            "facilities": dest.get('facilities', []),
+            "price": dest.get('price'),
+            "openingHours": dest.get('openingHours'),
+            "closingHours": dest.get('closingHours'),
+            "description": dest.get('description'),
+            "category": dest.get('category'),
+            "city": dest.get('city'),
+            "officialRating": dest.get('officialRating', 0),
+            "rating": dest.get('rating', 0),
+            "lat": dest.get('lat'),
+            "lon": dest.get('lon')
+        } for dest in destinations]
+
+        # Insert all destinations at once into MongoDB
+        collection.insert_many(destination_data)
         
         return jsonify({'success': True, 'message': 'Destinations saved to MongoDB'}), 200
     except Exception as e:
+        # If there's an error, print it and return an error response
         print(f"Error saving destinations: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
