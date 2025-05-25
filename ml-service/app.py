@@ -85,15 +85,19 @@ collection = db['destinations']
 def save_destinations():
     data = request.json
     destinations = data.get('destinations', [])
-    
+
     if not destinations:
         return jsonify({'error': 'No destinations data provided'}), 400
 
     try:
-        # Menyimpan data ke MongoDB
-        collection.insert_many(destinations)
+        batch_size = 50  # Ukuran batch data per kali insert
+        for i in range(0, len(destinations), batch_size):
+            batch = destinations[i:i + batch_size]
+            collection.insert_many(batch)  # Menyimpan batch ke MongoDB
+            print(f"Batch {i // batch_size + 1} saved.")  # Debug log
         return jsonify({'success': True, 'message': 'Destinations saved to MongoDB'}), 200
     except Exception as e:
+        print(f"Error saving destinations: {str(e)}")  # Debug log
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
