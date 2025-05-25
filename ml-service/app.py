@@ -81,6 +81,7 @@ client = MongoClient(MONGO_URI)
 db = client['test']
 collection = db['destinations']
 
+# Modified save_destinations function to store data into MongoDB using Mongoose model
 @app.route('/save_destinations', methods=['POST'])
 def save_destinations():
     data = request.json
@@ -90,14 +91,30 @@ def save_destinations():
         return jsonify({'error': 'No destinations data provided'}), 400
 
     try:
-        batch_size = 50  # Ukuran batch data per kali insert
-        for i in range(0, len(destinations), batch_size):
-            batch = destinations[i:i + batch_size]
-            collection.insert_many(batch)  # Menyimpan batch ke MongoDB
-            print(f"Batch {i // batch_size + 1} saved.")  # Debug log
+        # Loop through destinations and save each one using the Destination model
+        for dest in destinations:
+            # Create new destination document based on the model schema
+            destination_data = {
+                "name": dest.get('name'),
+                "location": dest.get('location'),
+                "facilities": dest.get('facilities', []),
+                "price": dest.get('price'),
+                "openingHours": dest.get('openingHours'),
+                "closingHours": dest.get('closingHours'),
+                "description": dest.get('description'),
+                "category": dest.get('category'),
+                "city": dest.get('city'),
+                "officialRating": dest.get('officialRating', 0),
+                "rating": dest.get('rating', 0),
+                "lat": dest.get('lat'),
+                "lon": dest.get('lon')
+            }
+            # Menyimpan ke MongoDB
+            collection.insert_one(destination_data)
+        
         return jsonify({'success': True, 'message': 'Destinations saved to MongoDB'}), 200
     except Exception as e:
-        print(f"Error saving destinations: {str(e)}")  # Debug log
+        print(f"Error saving destinations: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
