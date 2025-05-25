@@ -84,11 +84,11 @@ def get_all_destinations():
 def save_destinations():
     data = request.json
     destinations = data.get('destinations', [])
-    
+
     # Check if destinations data is not empty
     if not destinations:
         return jsonify({'error': 'No destinations data provided'}), 400
-    
+
     try:
         # Prepare data for insertion (using list comprehension)
         destination_data = [{
@@ -108,13 +108,15 @@ def save_destinations():
         } for dest in destinations]
 
         # Insert all destinations at once into MongoDB
-        collection.insert_many(destination_data)
+        result = collection.insert_many(destination_data)
         
-        return jsonify({'success': True, 'message': 'Destinations saved to MongoDB'}), 200
+        # Return success message and number of inserted records
+        return jsonify({'success': True, 'message': f'{len(result.inserted_ids)} destinations saved to MongoDB'}), 200
+
     except Exception as e:
-        # If there's an error, print it and return an error response
+        # Log the error for debugging
         print(f"Error saving destinations: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'An error occurred while saving destinations'}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  # fallback ke 6000 jika PORT tidak ada
