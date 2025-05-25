@@ -1,19 +1,11 @@
-const { addDestination, updateDestination, deleteDestination, getAllDestinations, getDestinationById } = require("../controllers/destinationController");
+const { syncDestinationsFromFlask, deleteDestination, getAllDestinations, getDestinationById, getDestinationByCategory } = require("../controllers/destinationController");
 const { protectAdmin, protectUser } = require("../middleware/authMiddleware");
 
 const destinationRoutes = [
   {
     method: "POST",
-    path: "/destinations",
-    handler: addDestination,
-    options: {
-      pre: [protectAdmin], // Gantilah `middleware` menjadi `pre`
-    },
-  },
-  {
-    method: "PUT",
-    path: "/destinations/{id}",
-    handler: updateDestination,
+    path: "/sync-destinations",
+    handler: syncDestinationsFromFlask,
     options: {
       pre: [protectAdmin], // Gantilah `middleware` menjadi `pre`
     },
@@ -36,8 +28,16 @@ const destinationRoutes = [
   },
   {
     method: "GET",
-    path: "/destinations/{id}",
+    path: "/destinations/id/{id}",
     handler: getDestinationById,
+    options: {
+      pre: [protectAdmin, protectUser], // Gantilah `middleware` menjadi `pre`
+    },
+  },
+  {
+    method: "GET",
+    path: "/destinations/category/{category}",
+    handler: getDestinationByCategory,
     options: {
       pre: [protectAdmin, protectUser], // Gantilah `middleware` menjadi `pre`
     },
