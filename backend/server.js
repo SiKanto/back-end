@@ -12,6 +12,7 @@ const destinationRoutes = require('./routes/destinationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 dotenv.config();  // Mengambil variabel lingkungan dari file .env
 
@@ -74,6 +75,7 @@ const init = async () => {
   server.route(adminRoutes);
   server.route(userRoutes);
   server.route(ticketRoutes);
+  server.route(recommendationRoutes);
 
   // Menjalankan server
   await server.start();

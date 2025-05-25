@@ -1,59 +1,5 @@
 const Destination = require('../models/destination');
-
-// Menambahkan destinasi baru
-exports.addDestination = async (req, h) => {
-  try {
-    const { name, location, facilities, review, price, openingHours, closingHours, description, category, city, rating, lat, lon } = req.payload;
-
-    // Cek apakah destinasi dengan nama yang sama sudah ada
-    const existingDestination = await Destination.findOne({ name });
-    if (existingDestination) {
-      return h.response({ message: 'Destination with this name already exists' }).code(400); // Respons jika destinasi sudah ada
-    }
-
-    // Jika destinasi belum ada, lanjutkan untuk membuat destinasi baru
-    const newDestination = new Destination({
-      name,
-      location,
-      facilities,
-      review,
-      price,
-      openingHours,
-      closingHours,
-      description,
-      category,
-      city,
-      officialRating,
-      rating,
-      lat,
-      lon
-    });
-
-    // Menyimpan destinasi baru ke database
-    await newDestination.save();
-
-    // Mengembalikan respons sukses dengan destinasi yang baru saja dibuat
-    return h.response(newDestination).code(201);  // Status code 201 untuk 'Created'
-  } catch (error) {
-    console.error('Error adding destination:', error);  // Log error untuk debugging
-    return h.response({ message: error.message }).code(500);  // Respons error jika terjadi kesalahan pada server
-  }
-};
-
-
-// Mengupdate destinasi berdasarkan ID
-exports.updateDestination = async (req, h) => {
-  try {
-    const updatedDestination = await Destination.findByIdAndUpdate(req.params.id, req.payload, { new: true });  // Ganti req.body menjadi req.payload
-    if (!updatedDestination) {
-      return h.response({ message: 'Destination not found' }).code(404);
-    }
-    return h.response(updatedDestination).code(200);  // Gunakan h.response() untuk mengirim respons
-  } catch (error) {
-    console.error('Error updating destination:', error);  // Log error untuk debugging
-    return h.response({ message: error.message }).code(500);  // Gunakan h.response() untuk menangani error
-  }
-};
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:6000';
 
 // Menghapus destinasi berdasarkan ID
 exports.deleteDestination = async (req, h) => {
@@ -66,6 +12,29 @@ exports.deleteDestination = async (req, h) => {
   } catch (error) {
     console.error('Error deleting destination:', error);  // Log error untuk debugging
     return h.response({ message: error.message }).code(500);  // Gunakan h.response() untuk menangani error
+  }
+};
+
+exports.syncDestinationsFromFlask = async (req, h) => {
+  try {
+    // Panggil Flask API
+    const response = await axios.get(`${ML_SERVICE_URL}/destinations`); // ganti URL sesuai
+    
+    const destinationsFromFlask = response.data.recommendations || response.data; // sesuaikan struktur respons
+    
+    if (!Array.isArray(destinationsFromFlask)) {
+      return h.response({ message: 'Data dari Flask tidak berbentuk array' }).code(400);
+    }
+
+    // Simpan ke MongoDB, contoh insert many
+    // Bisa juga pakai upsert supaya data tidak duplikat, ini contoh insertMany sederhana
+    await Destination.insertMany(destinationsFromFlask, { ordered: false }); // ordered:false agar tetap lanjut walau ada error duplikat
+
+    return h.response({ message: 'Sinkronisasi destinasi berhasil' }).code(200);
+
+  } catch (error) {
+    console.error('Error syncing destinations:', error);
+    return h.response({ message: error.message }).code(500);
   }
 };
 
