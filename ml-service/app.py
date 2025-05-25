@@ -2,8 +2,11 @@ import pandas as pd
 from flask import Flask, request, jsonify
 import tensorflow as tf
 import numpy as np
-import os
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -69,8 +72,30 @@ def get_all_destinations():
         'destinations': all_data
     })
 
+MONGO_URI = os.getenv("MONGO_URI")
+
+# Koneksi ke MongoDB menggunakan URI dari .env
+client = MongoClient(MONGO_URI)
+db = client['test']
+collection = db['destinations']
+
+@app.route('/save_destinations', methods=['POST'])
+def save_destinations():
+    data = request.json
+    destinations = data.get('destinations', [])
+    
+    if not destinations:
+        return jsonify({'error': 'No destinations data provided'}), 400
+
+    try:
+        # Menyimpan data ke MongoDB
+        collection.insert_many(destinations)
+        return jsonify({'success': True, 'message': 'Destinations saved to MongoDB'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  # fallback ke 6000 jika PORT tidak ada
     app.run(host='0.0.0.0', port=port, debug=True)
-    
+
 CORS(app)
