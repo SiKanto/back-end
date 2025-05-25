@@ -4,11 +4,13 @@ import tensorflow as tf
 import numpy as np
 from flask_cors import CORS
 from dotenv import load_dotenv
+from pymongo import MongoClient
 import os
 
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 # Load model
 model = tf.keras.models.load_model('model_kota.h5')
@@ -97,5 +99,3 @@ def save_destinations():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  # fallback ke 6000 jika PORT tidak ada
     app.run(host='0.0.0.0', port=port, debug=True)
-
-CORS(app)
