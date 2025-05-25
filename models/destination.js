@@ -29,6 +29,10 @@ const destinationSchema = new mongoose.Schema({
         type: String,  // Deskripsi wisata
         required: true
     },
+    category: {
+      type: String,  // Jam tutup
+      required: true
+    },
     city: {
         type: String,  // Asal kota
         required: true

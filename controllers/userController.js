@@ -3,16 +3,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 
-const client = new OAuth2Client("81377167280-9c9kc1rsq17oue91lu9e9rjd6r4jngfu.apps.googleusercontent.com");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Login dengan Google
 exports.loginWithGoogle = async (request, h) => {
   try {
     const { token } = request.payload;
 
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: "81377167280-9c9kc1rsq17oue91lu9e9rjd6r4jngfu.apps.googleusercontent.com",
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -25,13 +24,19 @@ exports.loginWithGoogle = async (request, h) => {
       // Buat user baru kalau belum ada
       user = new User({
         email,
-        username: name, // pakai 'username' bukan 'name'
+        username: name,
         phone: null,
         address: null,
-        password: null, // karena login pakai Google, tidak punya password
+        password: null,
         role: 'user',
+        status: 'Active',
       });
       await user.save();
+    } else {
+      // Cek status banned
+      if (user.status && user.status.toLowerCase() === 'banned') {
+        return h.response({ message: 'Akun Anda diblokir. Hubungi admin.' }).code(403);
+      }
     }
 
     const jwtToken = jwt.sign(
@@ -79,7 +84,6 @@ exports.registerUser = async (req, h) => {
   }
 };
 
-// Login user manual (email + password)
 exports.loginUser = async (req, h) => {
   try {
     const { email, password } = req.payload;
@@ -89,13 +93,16 @@ exports.loginUser = async (req, h) => {
       return h.response({ message: 'Email atau password salah' }).code(401);
     }
 
-    // Cek password
+    // Cek status banned
+    if (user.status && user.status.toLowerCase() === 'banned') {
+      return h.response({ message: 'Akun Anda diblokir. Hubungi admin.' }).code(403);
+    }
+
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) {
       return h.response({ message: 'Email atau password salah' }).code(401);
     }
 
-    // Buat JWT token
     const jwtToken = jwt.sign(
       { id: user._id, email: user.email },
       process.env.SECRET_KEY,

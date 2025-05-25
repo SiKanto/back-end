@@ -3,7 +3,7 @@ const Destination = require('../models/destination');
 // Menambahkan destinasi baru
 exports.addDestination = async (req, h) => {
   try {
-    const { name, location, facilities, review, price, openingHours, closingHours, description, city, rating, lat, lon } = req.payload;
+    const { name, location, facilities, review, price, openingHours, closingHours, description, category, city, rating, lat, lon } = req.payload;
 
     // Cek apakah destinasi dengan nama yang sama sudah ada
     const existingDestination = await Destination.findOne({ name });
@@ -21,7 +21,9 @@ exports.addDestination = async (req, h) => {
       openingHours,
       closingHours,
       description,
+      category,
       city,
+      officialRating,
       rating,
       lat,
       lon
@@ -89,5 +91,23 @@ exports.getDestinationById = async (req, h) => {
   } catch (error) {
     console.error('Error fetching destination:', error);  // Log error untuk debugging
     return h.response({ message: error.message }).code(500);  // Gunakan h.response() untuk menangani error
+  }
+};
+
+// Mengambil destinasi berdasarkan category.type
+exports.getDestinationByCategory = async (req, h) => {
+  try {
+    const categoryParam = req.params.category;
+
+    const destinations = await Destination.find({ "category.type": categoryParam });
+
+    if (!destinations || destinations.length === 0) {
+      return h.response({ message: 'Destinations not found for this category' }).code(404);
+    }
+
+    return h.response(destinations).code(200);
+  } catch (error) {
+    console.error('Error fetching destinations by category:', error);
+    return h.response({ message: error.message }).code(500);
   }
 };

@@ -1,4 +1,4 @@
-const { addDestination, updateDestination, deleteDestination, getAllDestinations, getDestinationById } = require("../controllers/destinationController");
+const { addDestination, updateDestination, deleteDestination, getAllDestinations, getDestinationById, getDestinationByCategory } = require("../controllers/destinationController");
 const { protectAdmin, protectUser } = require("../middleware/authMiddleware");
 
 const destinationRoutes = [
@@ -36,8 +36,16 @@ const destinationRoutes = [
   },
   {
     method: "GET",
-    path: "/destinations/{id}",
+    path: "/destinations/id/{id}",
     handler: getDestinationById,
+    options: {
+      pre: [protectAdmin, protectUser], // Gantilah `middleware` menjadi `pre`
+    },
+  },
+  {
+    method: "GET",
+    path: "/destinations/category/{category}",
+    handler: getDestinationByCategory,
     options: {
       pre: [protectAdmin, protectUser], // Gantilah `middleware` menjadi `pre`
     },
