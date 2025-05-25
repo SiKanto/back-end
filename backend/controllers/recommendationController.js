@@ -1,5 +1,4 @@
 const axios = require('axios');
-const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:6000';
 
 const getRecommendation = async (request, h) => {
   try {
@@ -13,7 +12,7 @@ const getRecommendation = async (request, h) => {
     }
 
     // Panggil ML service
-    const response = await axios.post(`${ML_SERVICE_URL}/predict`, {
+    const response = await axios.post(`https://ml-kanto.up.railway.app/predict`, {
       city: city.trim(),
     });
 

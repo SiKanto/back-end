@@ -35,7 +35,7 @@ const connectDB = async () => {
 connectDB();
 
 const server = Hapi.server({
-  port: process.env.PORT || 5000,  // Gunakan process.env.PORT dari Vercel atau fallback ke 5000
+  port: process.env.PORT || 5000,  // Gunakan process.env.PORT dari railway atau fallback ke 5000
   host: '0.0.0.0',
   routes: {
     cors: {
