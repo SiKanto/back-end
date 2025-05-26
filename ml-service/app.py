@@ -117,13 +117,23 @@ def get_all_destinations():
 @app.route('/save_destinations', methods=['POST'])
 def save_destinations():
     data = request.json
+    
+    # Check if 'destinations' key is provided in the request
     destinations = data.get('destinations', [])
-
+    
     if not destinations:
         return jsonify({'error': 'No destinations data provided'}), 400
-
-    try:
-        destination_data = [{
+    
+    # List to hold processed destination data
+    destination_data = []
+    
+    # Validate each destination data
+    for dest in destinations:
+        # Check if the required fields are present
+        if not dest.get('name') or not dest.get('location') or not dest.get('category'):
+            return jsonify({'error': 'Missing required fields for one or more destinations'}), 400
+        
+        destination_data.append({
             "name": dest.get('name'),
             "location": dest.get('location'),
             "facilities": dest.get('facilities', []),
@@ -137,8 +147,10 @@ def save_destinations():
             "rating": dest.get('rating', 0),
             "lat": dest.get('lat'),
             "lon": dest.get('lon')
-        } for dest in destinations]
-
+        })
+    
+    try:
+        # Insert data into MongoDB collection
         result = collection.insert_many(destination_data)
         return jsonify({'success': True, 'message': f'{len(result.inserted_ids)} destinations saved to MongoDB'}), 200
 
