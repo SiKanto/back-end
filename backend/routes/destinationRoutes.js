@@ -27,6 +27,14 @@ const destinationRoutes = [
     },
   },
   {
+    method: "DELETE",
+    path: "/destinations",
+    handler: deleteAllDestination,
+    options: {
+      pre: [protectAdmin], // Gantilah `middleware` menjadi `pre`
+    },
+  },
+  {
     method: "GET",
     path: "/destinations",
     handler: getAllDestinations,
