@@ -16,7 +16,7 @@ exports.deleteDestination = async (req, h) => {
 };
 
 // Handler untuk menyimpan destinasi
-const addDestinations = async (request, h) => {
+exports.addDestinations = async (request, h) => {
   try {
     const { destinations } = request.payload; // Mengambil data destinasi dari payload request
 
