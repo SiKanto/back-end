@@ -24,10 +24,23 @@ model = tf.keras.models.load_model('model_kota.h5')
 # Load dataset sekali (pastikan path sesuai)
 df = pd.read_excel('Dataset_Wisata_Madura.xlsx')  # dataset berisi info wisata
 
-if 'openingHours' in df.columns and 'closingHours' in df.columns:
-    df['openingHours'] = df['openingHours'].astype(str)
-    df['closingHours'] = df['closingHours'].astype(str)
+# Tambahkan kolom default jika tidak ada, agar tidak error saat diakses
+required_columns = [
+    'officialRating', 'rating', 'facilities', 'openingHours',
+    'closingHours', 'price', 'description', 'category', 'lat', 'lon'
+]
+for col in required_columns:
+    if col not in df.columns:
+        if col in ['officialRating', 'rating', 'price', 'lat', 'lon']:
+            df[col] = 0
+        elif col == 'facilities':
+            df[col] = ""
+        else:
+            df[col] = "-"
 
+# Pastikan jam buka dan tutup diubah jadi string (hindari NaT)
+df['openingHours'] = df['openingHours'].astype(str)
+df['closingHours'] = df['closingHours'].astype(str)
 
 # Mapping kota ke one-hot vector input model
 kategori_mapping = {
@@ -35,7 +48,7 @@ kategori_mapping = {
     'Sampang': [0,1,0,0,0,0],
     'Pamekasan': [0,0,1,0,0,0],
     'Sumenep': [0,0,0,1,0,0],
-    # dst
+    # dst sesuai kebutuhan
 }
 
 def preprocess(city_name):
@@ -46,25 +59,19 @@ def preprocess(city_name):
 def predict():
     data = request.json
     city = data.get('city', '')
-    
+
     input_data = preprocess(city)
-    preds = model.predict(input_data)  # output probabilitas
-    
-    # Misal output model adalah array probabilitas untuk masing-masing kategori wisata,
-    # misal preds = [[0.8, 0.1, 0.05, 0.05]]
+    preds = model.predict(input_data)
+
     scores = preds[0]
-    
-    # Ambil index rekomendasi dengan skor tertinggi
     idx = np.argmax(scores)
-    
-    # Filter dataset berdasarkan kota dan format data sesuai JSON yang diinginkan
+
     recommended_data = df[df['city'] == city]
 
-    # Format data destinasi sesuai dengan format yang diinginkan
     formatted_data = [{
         "name": row['name'],
         "location": row['location'],
-        "facilities": row['facilities'].split(','),  # Misalnya fasilitas disimpan dalam string yang dipisahkan koma
+        "facilities": row['facilities'].split(',') if pd.notnull(row['facilities']) else [],
         "price": row['price'],
         "openingHours": row['openingHours'],
         "closingHours": row['closingHours'],
@@ -76,21 +83,19 @@ def predict():
         "lat": row['lat'],
         "lon": row['lon']
     } for index, row in recommended_data.iterrows()]
-    
+
     return jsonify({
         'city': city,
         'prediction_scores': scores.tolist(),
-        'recommendations': formatted_data  # kirim data rekomendasi yang telah diformat
+        'recommendations': formatted_data
     })
 
-# Endpoint baru: ambil semua destinasi wisata tanpa parameter
 @app.route('/destinations', methods=['GET'])
 def get_all_destinations():
-    # Mengambil data dari DataFrame dan memformat sesuai dengan format JSON yang diinginkan
     formatted_data = [{
         "name": row['name'],
         "location": row['location'],
-        "facilities": row['facilities'].split(','),  # Misalnya fasilitas disimpan dalam string yang dipisahkan koma
+        "facilities": row['facilities'].split(',') if pd.notnull(row['facilities']) else [],
         "price": row['price'],
         "openingHours": row['openingHours'],
         "closingHours": row['closingHours'],
@@ -103,7 +108,6 @@ def get_all_destinations():
         "lon": row['lon']
     } for index, row in df.iterrows()]
 
-    # Mengembalikan data yang diformat ke frontend dalam format JSON
     return jsonify({
         'success': True,
         'total': len(formatted_data),
@@ -115,12 +119,10 @@ def save_destinations():
     data = request.json
     destinations = data.get('destinations', [])
 
-    # Check if destinations data is not empty
     if not destinations:
         return jsonify({'error': 'No destinations data provided'}), 400
 
     try:
-        # Prepare data for insertion (using list comprehension)
         destination_data = [{
             "name": dest.get('name'),
             "location": dest.get('location'),
@@ -137,17 +139,13 @@ def save_destinations():
             "lon": dest.get('lon')
         } for dest in destinations]
 
-        # Insert all destinations at once into MongoDB
         result = collection.insert_many(destination_data)
-        
-        # Return success message and number of inserted records
         return jsonify({'success': True, 'message': f'{len(result.inserted_ids)} destinations saved to MongoDB'}), 200
 
     except Exception as e:
-        # Log the error for debugging
         print(f"Error saving destinations: {str(e)}")
         return jsonify({'error': 'An error occurred while saving destinations'}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))  # fallback ke 6000 jika PORT tidak ada
+    port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
