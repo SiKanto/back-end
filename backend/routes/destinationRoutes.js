@@ -1,4 +1,4 @@
-const { syncDestinationsFromFlask, addDestinations, deleteDestination, getAllDestinations, getDestinationById, getDestinationByCategory } = require("../controllers/destinationController");
+const { syncDestinationsFromFlask, addDestinations, deleteDestination, deleteAllDestination, getAllDestinations, getDestinationById, getDestinationByCategory } = require("../controllers/destinationController");
 const { protectAdmin, protectUser } = require("../middleware/authMiddleware");
 
 const destinationRoutes = [
