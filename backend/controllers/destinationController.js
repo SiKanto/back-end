@@ -19,6 +19,29 @@ exports.deleteDestination = async (req, h) => {
   }
 };
 
+// Menghapus semua destinasi di database
+exports.deleteAllDestination = async (req, h) => {
+  try {
+    // Menghapus semua dokumen di koleksi Destination
+    const deletedDestinations = await Destination.deleteMany();
+
+    // Cek apakah ada dokumen yang dihapus
+    if (deletedDestinations.deletedCount === 0) {
+      return h
+        .response({ message: "No destinations found to delete" })
+        .code(404);
+    }
+
+    // Jika berhasil menghapus semua destinasi
+    return h
+      .response({ message: "All destinations deleted successfully" })
+      .code(200);
+  } catch (error) {
+    console.error("Error deleting destinations:", error); // Log error untuk debugging
+    return h.response({ message: error.message }).code(500); // Menangani error
+  }
+};
+
 exports.addDestinations = async (request, h) => {
   try {
     const { destinations } = request.payload;
