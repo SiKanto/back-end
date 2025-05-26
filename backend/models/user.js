@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: false, // Tidak wajib untuk Google login
+      unique: true
     },
     email: {
       type: String,
@@ -21,6 +22,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false, // Boleh kosong, bisa diisi belakangan
       default: null,
+      unique: true
     },
     address: {
       type: String,
