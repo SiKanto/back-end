@@ -57,27 +57,57 @@ def predict():
     # Ambil index rekomendasi dengan skor tertinggi
     idx = np.argmax(scores)
     
-    # Cari data rekomendasi dari dataset sesuai index atau kota
-    # Contoh: filter dataset berdasarkan kota
-    recommended_data = df[df['city'] == city].to_dict(orient='records')
-    
-    # Bisa juga filter berdasarkan kriteria lain, misal top N tempat wisata,
-    # atau sesuai idx dari model jika dataset berisi label kategori
+    # Filter dataset berdasarkan kota dan format data sesuai JSON yang diinginkan
+    recommended_data = df[df['city'] == city]
+
+    # Format data destinasi sesuai dengan format yang diinginkan
+    formatted_data = [{
+        "name": row['name'],
+        "location": row['location'],
+        "facilities": row['facilities'].split(','),  # Misalnya fasilitas disimpan dalam string yang dipisahkan koma
+        "price": row['price'],
+        "openingHours": row['openingHours'],
+        "closingHours": row['closingHours'],
+        "description": row['description'],
+        "category": row['category'],
+        "city": row['city'],
+        "officialRating": row['officialRating'],
+        "rating": row['rating'],
+        "lat": row['lat'],
+        "lon": row['lon']
+    } for index, row in recommended_data.iterrows()]
     
     return jsonify({
         'city': city,
         'prediction_scores': scores.tolist(),
-        'recommendations': recommended_data  # kirim data lengkap ke frontend
+        'recommendations': formatted_data  # kirim data rekomendasi yang telah diformat
     })
 
 # Endpoint baru: ambil semua destinasi wisata tanpa parameter
 @app.route('/destinations', methods=['GET'])
 def get_all_destinations():
-    all_data = df.to_dict(orient='records')
+    # Mengambil data dari DataFrame dan memformat sesuai dengan format JSON yang diinginkan
+    formatted_data = [{
+        "name": row['name'],
+        "location": row['location'],
+        "facilities": row['facilities'].split(','),  # Misalnya fasilitas disimpan dalam string yang dipisahkan koma
+        "price": row['price'],
+        "openingHours": row['openingHours'],
+        "closingHours": row['closingHours'],
+        "description": row['description'],
+        "category": row['category'],
+        "city": row['city'],
+        "officialRating": row['officialRating'],
+        "rating": row['rating'],
+        "lat": row['lat'],
+        "lon": row['lon']
+    } for index, row in df.iterrows()]
+
+    # Mengembalikan data yang diformat ke frontend dalam format JSON
     return jsonify({
         'success': True,
-        'total': len(all_data),
-        'destinations': all_data
+        'total': len(formatted_data),
+        'destinations': formatted_data
     })
 
 @app.route('/save_destinations', methods=['POST'])
