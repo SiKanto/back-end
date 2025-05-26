@@ -7,7 +7,15 @@ const destinationRoutes = [
     path: "/sync-destinations",
     handler: syncDestinationsFromFlask,
     options: {
-      pre: [protectAdmin], // Gantilah `middleware` menjadi `pre`
+      pre: [protectAdmin, protectUser], // Gantilah `middleware` menjadi `pre`
+    },
+  },
+  {
+    method: "POST",
+    path: "/add-destinations",
+    handler: addDestinations,
+    options: {
+      pre: [protectAdmin, protectUser], // Gantilah `middleware` menjadi `pre`
     },
   },
   {

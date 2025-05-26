@@ -114,50 +114,6 @@ def get_all_destinations():
         'destinations': formatted_data
     })
 
-@app.route('/save_destinations', methods=['POST'])
-def save_destinations():
-    data = request.json
-    
-    # Check if 'destinations' key is provided in the request
-    destinations = data.get('destinations', [])
-    
-    if not destinations:
-        return jsonify({'error': 'No destinations data provided'}), 400
-    
-    # List to hold processed destination data
-    destination_data = []
-    
-    # Validate each destination data
-    for dest in destinations:
-        # Check if the required fields are present
-        if not dest.get('name') or not dest.get('location') or not dest.get('category'):
-            return jsonify({'error': 'Missing required fields for one or more destinations'}), 400
-        
-        destination_data.append({
-            "name": dest.get('name'),
-            "location": dest.get('location'),
-            "facilities": dest.get('facilities', []),
-            "price": dest.get('price'),
-            "openingHours": dest.get('openingHours'),
-            "closingHours": dest.get('closingHours'),
-            "description": dest.get('description'),
-            "category": dest.get('category'),
-            "city": dest.get('city'),
-            "officialRating": dest.get('officialRating', 0),
-            "rating": dest.get('rating', 0),
-            "lat": dest.get('lat'),
-            "lon": dest.get('lon')
-        })
-    
-    try:
-        # Insert data into MongoDB collection
-        result = collection.insert_many(destination_data)
-        return jsonify({'success': True, 'message': f'{len(result.inserted_ids)} destinations saved to MongoDB'}), 200
-
-    except Exception as e:
-        print(f"Error saving destinations: {str(e)}")
-        return jsonify({'error': 'An error occurred while saving destinations'}), 500
-
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
