@@ -15,6 +15,34 @@ exports.deleteDestination = async (req, h) => {
   }
 };
 
+// Handler untuk menyimpan destinasi
+const addDestinations = async (request, h) => {
+  try {
+    const { destinations } = request.payload; // Mengambil data destinasi dari payload request
+
+    // Validasi bahwa destinasi adalah array
+    if (!Array.isArray(destinations)) {
+      return h.response({ message: 'Destinations data must be an array' }).code(400);
+    }
+
+    // Menyimpan data destinasi ke MongoDB
+    const savedDestinations = await Destination.insertMany(destinations);
+
+    // Mengembalikan respon sukses
+    return h.response({
+      success: true,
+      message: `${savedDestinations.length} destinations saved to MongoDB`,
+    }).code(200);
+
+  } catch (error) {
+    console.error('Error saving destinations:', error);
+    return h.response({
+      success: false,
+      message: 'Failed to save destinations',
+    }).code(500);
+  }
+};
+
 exports.syncDestinationsFromFlask = async (req, h) => {
   try {
     // Panggil Flask API
