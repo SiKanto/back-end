@@ -52,7 +52,6 @@ exports.loginWithGoogle = async (request, h) => {
   }
 };
 
-// Registrasi user manual (email + password)
 exports.registerUser = async (req, h) => {
   try {
     const { email, password, firstName, lastName } = req.payload;
@@ -63,6 +62,9 @@ exports.registerUser = async (req, h) => {
       return h.response({ message: 'Email sudah terdaftar' }).code(400);
     }
 
+    // Gabungkan firstName dan lastName menjadi username
+    const username = `${firstName} ${lastName}`;
+
     // Hash password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -71,6 +73,7 @@ exports.registerUser = async (req, h) => {
       email,
       firstName,
       lastName,
+      username, // Menyimpan username yang digabungkan
       password: hashedPassword,
       phone: null,
       address: null,

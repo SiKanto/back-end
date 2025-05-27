@@ -38,7 +38,7 @@ const createTicket = async (req, h) => {
 const getAllTickets = async (req, h) => {
   try {
     const tickets = await Ticket.find()
-      .populate('userId', 'name email')  // Populate hanya dengan fields yang dibutuhkan
+      .populate('userId', 'username email')  // Populate hanya dengan fields yang dibutuhkan
       .populate('destinationId', 'name location');  // Populasi destinasi dengan fields yang dibutuhkan
 
     return h.response({ tickets }).code(200);
@@ -57,7 +57,7 @@ const getTicketsByUserId = async (req, h) => {
     }
 
     const tickets = await Ticket.find({ userId })
-      .populate('userId', 'name email')  // Populate user details
+      .populate('userId', 'username email')  // Populate user details
       .populate('destinationId', 'name location');  // Populate destination details
 
     if (!tickets.length) {
