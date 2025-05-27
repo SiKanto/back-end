@@ -8,15 +8,17 @@ exports.createAdmin = async (req, h) => {
 
     // Gabungkan firstName dan lastName menjadi username
     let username = `${firstName} ${lastName}`;
+    console.log('Generated username:', username);  // Log username yang dihasilkan
 
-    // Cek apakah username sudah ada
     let existingUsername = await Admin.findOne({ username });
     let counter = 1;
     while (existingUsername) {
       username = `${firstName} ${lastName} ${counter}`;
+      console.log('Checking username:', username);  // Log untuk username yang sedang dicek
       existingUsername = await Admin.findOne({ username });
       counter++;
     }
+    console.log('Final username:', username);  // Log username final yang digunakan
 
     // Cek apakah admin dengan email sudah ada
     const existingAdmin = await Admin.findOne({ email });
