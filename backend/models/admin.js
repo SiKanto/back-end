@@ -4,7 +4,7 @@ const validator = require('validator');  // Untuk validasi email
 
 const adminSchema = new mongoose.Schema(
   {
-    firsName: {
+    firstName: {
       type: String,
       required: [true, 'First Name is required'],
       unique: true,
