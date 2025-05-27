@@ -110,6 +110,11 @@ exports.loginUser = async (req, h) => {
       return h.response({ message: 'User not found' }).code(404);
     }
 
+    // Cek apakah status user adalah 'banned'
+    if (user.status === 'banned') {
+      return h.response({ message: 'Your account is banned. Please contact support.' }).code(403);
+    }
+
     // Verifikasi password (Misalnya jika ada fitur hash untuk password)
     const isPasswordMatch = await user.matchPassword(password);
     if (!isPasswordMatch) {
@@ -139,15 +144,29 @@ exports.getAllUsers = async (req, h) => {
 // Update user data atau status (termasuk phone & address)
 exports.updateUser = async (req, h) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.payload, { new: true });
-    if (!user) {
-      return h.response({ message: 'User not found' }).code(404);
+    const { status } = req.payload;  // Menangkap status dari payload
+
+    // Jika status diubah menjadi 'banned', beri peringatan
+    if (status && status.toLowerCase() === 'banned') {
+      const user = await User.findByIdAndUpdate(req.params.id, { status: 'banned' }, { new: true });
+      if (!user) {
+        return h.response({ message: 'User not found' }).code(404);
+      }
+      return h.response({ message: 'User banned successfully', user }).code(200);
+    } else {
+      // Jika status bukan banned, update data seperti biasa
+      const user = await User.findByIdAndUpdate(req.params.id, req.payload, { new: true });
+      if (!user) {
+        return h.response({ message: 'User not found' }).code(404);
+      }
+      return h.response(user).code(200);
     }
-    return h.response(user).code(200);
+
   } catch (error) {
     return h.response({ message: 'Error updating user', error: error.message }).code(500);
   }
 };
+
 
 // Delete user
 exports.deleteUser = async (req, h) => {

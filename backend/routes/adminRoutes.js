@@ -8,13 +8,14 @@ const adminRoutes = [
     method: "POST",
     path: "/admin/create",
     options: {
-      pre: [protectAdmin], // Menambahkan proteksi admin
+      // pre: [protectAdmin], // Menambahkan proteksi admin
       validate: {
         payload: Joi.object({
           firstName: Joi.string().min(3).max(30).required(), // Validasi firstName
           lastName: Joi.string().min(3).max(30).required(), // Validasi lastName
           email: Joi.string().email().required(), // Validasi email
           password: Joi.string().min(8).required(), // Validasi password
+          username: Joi.string().required(),
         }),
         // Menangani kesalahan validasi
         failAction: (req, h, error) => {
