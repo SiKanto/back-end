@@ -7,12 +7,10 @@ const adminSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: [true, 'First Name is required'],
-      unique: true,
     },
     lastName: {
       type: String,
       required: [true, 'Last Name is required'],
-      unique: true,
     },
     username: {
       type: String,
