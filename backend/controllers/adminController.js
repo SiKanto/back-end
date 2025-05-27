@@ -6,6 +6,9 @@ exports.createAdmin = async (req, h) => {
   try {
     const { firstName, lastName, email, password } = req.payload;  // Menggunakan req.payload di Hapi.js
 
+    // Gabungkan firstName dan lastName menjadi username
+    const username = `${firstName} ${lastName}`;
+
     // Cek apakah admin dengan email sudah ada
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
@@ -18,6 +21,7 @@ exports.createAdmin = async (req, h) => {
       lastName,
       email,
       password,
+      username,  // Menyimpan username yang digabungkan
       role: 'admin', // Menetapkan role sebagai admin secara otomatis
     });
 
@@ -29,7 +33,6 @@ exports.createAdmin = async (req, h) => {
     return h.response({ message: 'Error creating admin', error: error.message }).code(500);
   }
 };
-
 
 // Login Admin
 exports.loginAdmin = async (req, h) => {

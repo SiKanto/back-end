@@ -14,6 +14,11 @@ const adminSchema = new mongoose.Schema(
       required: [true, 'Last Name is required'],
       unique: true,
     },
+    username: {
+      type: String,
+      required: [true, 'Username is required'],
+      unique: true,
+    },
     email: {
       type: String,
       required: [true, 'Email is required'],
