@@ -1,35 +1,35 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const validator = require('validator');  // Untuk validasi email
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const validator = require("validator"); // Untuk validasi email
 
 const adminSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: [true, 'First Name is required'],
+      required: [true, "First Name is required"],
     },
     lastName: {
       type: String,
-      required: [true, 'Last Name is required'],
+      required: [true, "Last Name is required"],
     },
     username: {
       type: String,
-      required: [true, 'Username is required'],
+      required: [true, "Username is required"],
       unique: true,
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
-      unique: true,  // Pastikan email unik
+      required: [true, "Email is required"],
+      unique: true, // Pastikan email unik
       validate: {
-        validator: (value) => validator.isEmail(value),  // Validasi format email
-        message: 'Invalid email format',
+        validator: (value) => validator.isEmail(value), // Validasi format email
+        message: "Invalid email format",
       },
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
-      minlength: 6,  // Minimal panjang password
+      required: [true, "Password is required"],
+      minlength: 6, // Minimal panjang password
     },
   },
   {
@@ -43,8 +43,8 @@ adminSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Enkripsi password sebelum menyimpannya ke database
-adminSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+adminSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
     return next();
   }
 
@@ -53,6 +53,6 @@ adminSchema.pre('save', async function (next) {
 });
 
 // Membuat model Admin
-const Admin = mongoose.model('Admin', adminSchema);
+const Admin = mongoose.model("Admin", adminSchema);
 
 module.exports = Admin;
