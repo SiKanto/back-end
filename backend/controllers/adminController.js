@@ -4,21 +4,18 @@ const jwt = require('jsonwebtoken');
 // Membuat admin baru
 exports.createAdmin = async (req, h) => {
   try {
-    const { firstName, lastName, email, password } = req.payload;  // Menggunakan req.payload di Hapi.js
+    const { firstName, lastName, email, password, username } = req.payload; // Mengambil username dari frontend
 
-    // Gabungkan firstName dan lastName menjadi username
-    let username = `${firstName} ${lastName}`;
-    console.log('Generated username:', username);  // Log username yang dihasilkan
-
+    // Mengecek apakah username sudah ada di database
     let existingUsername = await Admin.findOne({ username });
     let counter = 1;
+    
+    // Jika username sudah ada, tambahkan angka di belakang username sampai ditemukan yang unik
     while (existingUsername) {
-      username = `${firstName} ${lastName} ${counter}`;
-      console.log('Checking username:', username);  // Log untuk username yang sedang dicek
+      username = `${username}${counter}`;
       existingUsername = await Admin.findOne({ username });
       counter++;
     }
-    console.log('Final username:', username);  // Log username final yang digunakan
 
     // Cek apakah admin dengan email sudah ada
     const existingAdmin = await Admin.findOne({ email });
@@ -32,7 +29,7 @@ exports.createAdmin = async (req, h) => {
       lastName,
       email,
       password,
-      username,  // Menyimpan username yang digabungkan
+      username,  // Menyimpan username yang sudah digenerate dan unik
       role: 'admin', // Menetapkan role sebagai admin secara otomatis
     });
 
@@ -48,7 +45,7 @@ exports.createAdmin = async (req, h) => {
 // Login Admin
 exports.loginAdmin = async (req, h) => {
   try {
-    const { email, password } = req.payload;  // Menggunakan req.payload di Hapi.js
+    const { email, password } = req.payload;
 
     const admin = await Admin.findOne({ email });
     if (!admin) {

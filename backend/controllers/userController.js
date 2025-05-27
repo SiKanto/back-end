@@ -54,68 +54,75 @@ exports.loginWithGoogle = async (request, h) => {
 
 exports.registerUser = async (req, h) => {
   try {
-    const { email, password, firstName, lastName } = req.payload;
+    const { firstName, lastName, email, password, username, phone, address } = req.payload;
 
-    // Cek apakah email sudah terdaftar
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return h.response({ message: 'Email sudah terdaftar' }).code(400);
+    // Mengecek apakah username sudah ada di database
+    let existingUsername = await User.findOne({ username });
+    let counter = 1;
+
+    // Jika username sudah ada, tambahkan angka di belakang username sampai ditemukan yang unik
+    while (existingUsername) {
+      username = `${username}${counter}`;
+      existingUsername = await User.findOne({ username });
+      counter++;
     }
 
-    // Gabungkan firstName dan lastName menjadi username
-    const username = `${firstName} ${lastName}`;
+    // Cek apakah email sudah ada
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return h.response({ message: 'User with this email already exists' }).code(400);
+    }
 
-    // Hash password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // Cek apakah phone sudah ada
+    const existingPhone = await User.findOne({ phone });
+    if (existingPhone) {
+      return h.response({ message: 'Phone number already used' }).code(400);
+    }
 
+    // Membuat user baru dan menyimpannya ke database
     const newUser = new User({
-      email,
       firstName,
       lastName,
-      username, // Menyimpan username yang digabungkan
-      password: hashedPassword,
-      phone: null,
-      address: null,
-      role: 'user',
+      email,
+      password,
+      username,  // Menyimpan username yang sudah digenerate dan unik
+      phone,
+      address,
+      status: 'Active', // Status default
     });
 
     await newUser.save();
 
-    return h.response({ message: 'Registrasi berhasil' }).code(201);
+    return h.response({ message: 'User registered successfully' }).code(201);
   } catch (error) {
-    return h.response({ message: 'Error registrasi', error: error.message }).code(500);
+    console.error('Error details:', error);  // Menangkap error untuk debugging
+    return h.response({ message: 'Error registering user', error: error.message }).code(500);
   }
 };
 
+// Login User
 exports.loginUser = async (req, h) => {
   try {
     const { email, password } = req.payload;
 
     const user = await User.findOne({ email });
-    if (!user || !user.password) {
-      return h.response({ message: 'Email atau password salah' }).code(401);
+    if (!user) {
+      return h.response({ message: 'User not found' }).code(404);
     }
 
-    // Cek status banned
-    if (user.status && user.status.toLowerCase() === 'banned') {
-      return h.response({ message: 'Akun Anda diblokir. Hubungi admin.' }).code(403);
+    // Verifikasi password (Misalnya jika ada fitur hash untuk password)
+    const isPasswordMatch = await user.matchPassword(password);
+    if (!isPasswordMatch) {
+      return h.response({ message: 'Invalid credentials' }).code(400);
     }
 
-    const passwordValid = await bcrypt.compare(password, user.password);
-    if (!passwordValid) {
-      return h.response({ message: 'Email atau password salah' }).code(401);
-    }
+    // Generate JWT token
+    const token = jwt.sign({ id: user._id, email: user.email }, process.env.SECRET_KEY, { expiresIn: '1h' });
 
-    const jwtToken = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.SECRET_KEY,
-      { expiresIn: '1d' }
-    );
-
-    return h.response({ token: jwtToken }).code(200);
+    return h.response({ token }).code(200);
   } catch (error) {
-    return h.response({ message: 'Error login', error: error.message }).code(500);
+    console.error('Error details:', error);  // Menangkap error untuk debugging
+    return h.response({ message: 'Error logging in', error: error.message }).code(500);
   }
 };
 
