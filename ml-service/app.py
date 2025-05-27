@@ -27,11 +27,11 @@ df = pd.read_excel('Dataset_Wisata_Madura.xlsx')  # dataset berisi info wisata
 # Tambahkan kolom default jika tidak ada, agar tidak error saat diakses
 required_columns = [
     'officialRating', 'rating', 'facilities', 'openingHours',
-    'closingHours', 'price', 'description', 'category', 'lat', 'lon'
+    'closingHours', 'price', 'description', 'category', 'lat', 'lon', 'visitor'
 ]
 for col in required_columns:
     if col not in df.columns:
-        if col in ['officialRating', 'rating', 'price', 'lat', 'lon']:
+        if col in ['officialRating', 'rating', 'price', 'lat', 'lon', 'visitor']:
             df[col] = 0
         elif col == 'facilities':
             df[col] = ""
@@ -78,6 +78,7 @@ def predict():
         "description": row['description'],
         "category": row['category'],
         "city": row['city'],
+        "visitor": row['visitor'],
         "officialRating": row['officialRating'],
         "rating": row['rating'],
         "lat": row['lat'],
@@ -102,6 +103,7 @@ def get_all_destinations():
         "description": row['description'],
         "category": row['category'],
         "city": row['city'],
+        "visitor": row['visitor'],
         "officialRating": row['officialRating'],
         "rating": row['rating'],
         "lat": row['lat'],

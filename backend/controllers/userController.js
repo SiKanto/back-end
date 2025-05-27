@@ -55,7 +55,7 @@ exports.loginWithGoogle = async (request, h) => {
 // Registrasi user manual (email + password)
 exports.registerUser = async (req, h) => {
   try {
-    const { email, password, username } = req.payload;
+    const { email, password, firstName, lastName } = req.payload;
 
     // Cek apakah email sudah terdaftar
     const existingUser = await User.findOne({ email });
@@ -69,7 +69,8 @@ exports.registerUser = async (req, h) => {
 
     const newUser = new User({
       email,
-      username,
+      firstName,
+      lastName,
       password: hashedPassword,
       phone: null,
       address: null,

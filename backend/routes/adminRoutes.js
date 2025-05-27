@@ -11,7 +11,8 @@ const adminRoutes = [
       pre: [protectAdmin], // Menambahkan proteksi admin
       validate: {
         payload: Joi.object({
-          username: Joi.string().min(3).max(30).required(), // Validasi username
+          firstName: Joi.string().min(3).max(30).required(), // Validasi firstName
+          lastName: Joi.string().min(3).max(30).required(), // Validasi lastName
           email: Joi.string().email().required(), // Validasi email
           password: Joi.string().min(8).required(), // Validasi password
         }),
