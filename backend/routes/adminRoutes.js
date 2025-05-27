@@ -13,7 +13,6 @@ const adminRoutes = [
         payload: Joi.object({
           firstName: Joi.string().min(3).max(30).required(), // Validasi firstName
           lastName: Joi.string().min(3).max(30).required(), // Validasi lastName
-          username: Joi.string().min(3).max(30).required(),
           email: Joi.string().email().required(), // Validasi email
           password: Joi.string().min(8).required(), // Validasi password
         }),
