@@ -7,7 +7,16 @@ exports.createAdmin = async (req, h) => {
     const { firstName, lastName, email, password } = req.payload;  // Menggunakan req.payload di Hapi.js
 
     // Gabungkan firstName dan lastName menjadi username
-    const username = `${firstName} ${lastName}`;
+    let username = `${firstName} ${lastName}`;
+
+    // Cek apakah username sudah ada
+    let existingUsername = await Admin.findOne({ username });
+    let counter = 1;
+    while (existingUsername) {
+      username = `${firstName} ${lastName} ${counter}`;
+      existingUsername = await Admin.findOne({ username });
+      counter++;
+    }
 
     // Cek apakah admin dengan email sudah ada
     const existingAdmin = await Admin.findOne({ email });
