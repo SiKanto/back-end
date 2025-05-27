@@ -2,10 +2,15 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    firsName: {
       type: String,
-      required: false, // Tidak wajib untuk Google login
-      unique: true
+      required: [true, 'First Name is required'],
+      unique: true,
+    },
+    lastName: {
+      type: String,
+      required: [true, 'Last Name is required'],
+      unique: true,
     },
     email: {
       type: String,

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 // Membuat admin baru
 exports.createAdmin = async (req, h) => {
   try {
-    const { username, email, password } = req.payload;  // Menggunakan req.payload di Hapi.js
+    const { firstName, lastName, email, password } = req.payload;  // Menggunakan req.payload di Hapi.js
 
     // Cek apakah admin dengan email sudah ada
     const existingAdmin = await Admin.findOne({ email });
@@ -14,7 +14,8 @@ exports.createAdmin = async (req, h) => {
 
     // Membuat admin baru dan menyimpannya ke database
     const newAdmin = new Admin({
-      username,
+      firstName,
+      lastName,
       email,
       password,
       role: 'admin', // Menetapkan role sebagai admin secara otomatis

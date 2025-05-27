@@ -30,6 +30,10 @@ const destinationSchema = new mongoose.Schema({
         type: String,  // Deskripsi wisata
         required: true
     },
+    visitor: {
+      type: Number,
+      default: 0
+    },
     category: {
       type: String,  // Jam tutup
       required: true
