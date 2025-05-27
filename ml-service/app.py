@@ -44,10 +44,10 @@ df['closingHours'] = df['closingHours'].astype(str)
 
 # Mapping kota ke one-hot vector input model
 kategori_mapping = {
-    'Bangkalan': [1,0,0,0,0,0],
-    'Sampang': [0,1,0,0,0,0],
-    'Pamekasan': [0,0,1,0,0,0],
-    'Sumenep': [0,0,0,1,0,0],
+    'Bangkalan': [1,0,0,0,0,0,0,0],
+    'Sampang': [0,1,0,0,0,0,0,0],
+    'Pamekasan': [0,0,1,0,0,0,0,0],
+    'Sumenep': [0,0,0,1,0,0,0,0],
     # dst sesuai kebutuhan
 }
 
@@ -66,7 +66,11 @@ def predict():
     scores = preds[0]
     idx = np.argmax(scores)
 
+    # Ambil data destinasi berdasarkan kota
     recommended_data = df[df['city'] == city]
+
+    # Urutkan berdasarkan rating
+    recommended_data_sorted = recommended_data.sort_values(by=['rating','visitor'], ascending=False)
 
     formatted_data = [{
         "name": row['name'],
@@ -83,7 +87,7 @@ def predict():
         "rating": row['rating'],
         "lat": row['lat'],
         "lon": row['lon']
-    } for index, row in recommended_data.iterrows()]
+    } for index, row in recommended_data_sorted.iterrows()]
 
     return jsonify({
         'city': city,

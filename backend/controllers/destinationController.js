@@ -1,5 +1,5 @@
 const Destination = require("../models/destination");
-const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:6000";
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || "http://localhost:8080";
 
 // Menghapus destinasi berdasarkan ID
 exports.deleteDestination = async (req, h) => {
