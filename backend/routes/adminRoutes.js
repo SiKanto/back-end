@@ -1,4 +1,5 @@
-const { createAdmin, loginAdmin, checkEmail, resetPassword } = require("../controllers/adminController"); // Mengimpor controller yang sudah ada
+const { createAdmin, loginAdmin, checkEmail, resetPassword } = require("../controllers/adminController"); //\
+const Joi = require("@hapi/joi");
 
 const adminRoutes = [
   // Route untuk membuat admin baru (hanya bisa diakses oleh admin)
