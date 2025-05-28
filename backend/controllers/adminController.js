@@ -97,12 +97,8 @@ exports.resetPassword = async (req, h) => {
       return h.response({ message: 'Admin not found' }).code(404);
     }
 
-    // Enkripsi password baru
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
     // Update password admin
-    admin.password = hashedPassword;
+    admin.password = newPassword;
     await admin.save();
 
     return h.response({ message: 'Password reset successful' }).code(200);
