@@ -1,6 +1,4 @@
-const { createAdmin, loginAdmin } = require("../controllers/adminController"); // Mengimpor controller
-const { protectAdmin } = require("../middleware/authMiddleware"); // Middleware untuk proteksi admin
-const Joi = require("@hapi/joi"); // Mengimpor Joi untuk validasi
+const { createAdmin, loginAdmin, checkEmail, resetPassword } = require("../controllers/adminController"); // Mengimpor controller yang sudah ada
 
 const adminRoutes = [
   // Route untuk membuat admin baru (hanya bisa diakses oleh admin)
@@ -8,16 +6,14 @@ const adminRoutes = [
     method: "POST",
     path: "/admin/create",
     options: {
-      // pre: [protectAdmin], // Menambahkan proteksi admin
       validate: {
         payload: Joi.object({
-          firstName: Joi.string().min(3).max(30).required(), // Validasi firstName
-          lastName: Joi.string().min(3).max(30).required(), // Validasi lastName
-          email: Joi.string().email().required(), // Validasi email
-          password: Joi.string().min(8).required(), // Validasi password
+          firstName: Joi.string().min(3).max(30).required(),
+          lastName: Joi.string().min(3).max(30).required(),
+          email: Joi.string().email().required(),
+          password: Joi.string().min(8).required(),
           username: Joi.string().required(),
         }),
-        // Menangani kesalahan validasi
         failAction: (req, h, error) => {
           return h
             .response({ message: error.details[0].message })
@@ -28,11 +24,28 @@ const adminRoutes = [
     },
     handler: createAdmin,
   },
-  // Route untuk login admin dan mendapatkan token JWT (Tidak perlu proteksi karena login)
+
+  // Route untuk login admin dan mendapatkan token JWT
   {
     method: "POST",
     path: "/admin/login",
     handler: loginAdmin,
+    options: {},
+  },
+
+  // Route untuk memeriksa email (cek apakah email ada di database)
+  {
+    method: "POST",
+    path: "/admin/check-email",
+    handler: checkEmail,
+    options: {},
+  },
+
+  // Route untuk mereset password admin
+  {
+    method: "POST",
+    path: "/admin/reset-password",
+    handler: resetPassword,
     options: {},
   },
 ];

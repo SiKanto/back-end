@@ -1,15 +1,16 @@
 const Admin = require('../models/admin');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs'); // Untuk mengenkripsi password baru
 
 // Membuat admin baru
 exports.createAdmin = async (req, h) => {
   try {
-    const { firstName, lastName, email, password, username } = req.payload; // Mengambil username dari frontend
+    const { firstName, lastName, email, password, username } = req.payload;
 
     // Mengecek apakah username sudah ada di database
     let existingUsername = await Admin.findOne({ username });
     let counter = 1;
-    
+
     // Jika username sudah ada, tambahkan angka di belakang username sampai ditemukan yang unik
     while (existingUsername) {
       username = `${username}${counter}`;
@@ -29,15 +30,15 @@ exports.createAdmin = async (req, h) => {
       lastName,
       email,
       password,
-      username,  // Menyimpan username yang sudah digenerate dan unik
-      role: 'admin', // Menetapkan role sebagai admin secara otomatis
+      username,
+      role: 'admin',
     });
 
     await newAdmin.save();
 
     return h.response({ message: 'Admin created successfully' }).code(201);
   } catch (error) {
-    console.error('Error details:', error);  // Menangkap error untuk debugging
+    console.error('Error details:', error);
     return h.response({ message: 'Error creating admin', error: error.message }).code(500);
   }
 };
@@ -63,7 +64,50 @@ exports.loginAdmin = async (req, h) => {
 
     return h.response({ token }).code(200);
   } catch (error) {
-    console.error('Error details:', error);  // Menangkap error untuk debugging
+    console.error('Error details:', error);
     return h.response({ message: 'Error logging in', error: error.message }).code(500);
+  }
+};
+
+// Cek apakah email ada
+exports.checkEmail = async (req, h) => {
+  try {
+    const { email } = req.payload;
+
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return h.response({ exists: false }).code(200); // Email tidak ditemukan
+    }
+
+    return h.response({ exists: true }).code(200); // Email ditemukan
+  } catch (error) {
+    console.error('Error details:', error);
+    return h.response({ message: 'Error checking email', error: error.message }).code(500);
+  }
+};
+
+// Reset password admin
+exports.resetPassword = async (req, h) => {
+  try {
+    const { email, newPassword } = req.payload;
+
+    // Cari admin berdasarkan email
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return h.response({ message: 'Admin not found' }).code(404);
+    }
+
+    // Enkripsi password baru
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password admin
+    admin.password = hashedPassword;
+    await admin.save();
+
+    return h.response({ message: 'Password reset successful' }).code(200);
+  } catch (error) {
+    console.error('Error details:', error);
+    return h.response({ message: 'Error resetting password', error: error.message }).code(500);
   }
 };
