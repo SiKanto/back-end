@@ -42,7 +42,6 @@ const server = Hapi.server({
       origin: ['*'],  // Mengizinkan semua asal, bisa ditentukan lebih spesifik seperti ['http://localhost:3000']
       credentials: true,  // Mengizinkan credentials (cookies, etc.)
       headers: ['Content-Type', 'Authorization'],  // Menentukan headers yang diizinkan
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     },
   },
 });
