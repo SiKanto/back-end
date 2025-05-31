@@ -7,6 +7,12 @@ const ticketSchema = new mongoose.Schema({
     ref: 'User',  // Referensi ke model User
     required: true,
   },
+  phone: {
+    type: String,
+    required: false, // Boleh kosong, bisa diisi belakangan
+    default: null,
+    unique: true
+  },
   destinationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Destination',  // Referensi ke model Destination

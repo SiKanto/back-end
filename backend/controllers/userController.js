@@ -25,8 +25,6 @@ exports.loginWithGoogle = async (request, h) => {
       user = new User({
         email,
         username: name,
-        phone: null,
-        address: null,
         password: null,
         role: 'user',
         status: 'Active',
@@ -86,8 +84,6 @@ exports.registerUser = async (req, h) => {
       email,
       password,
       username,  // Menyimpan username yang sudah digenerate dan unik
-      phone,
-      address,
       status: 'Active', // Status default
     });
 

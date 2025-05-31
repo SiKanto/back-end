@@ -5,7 +5,7 @@ const Destination = require('../models/destination');
 // Membuat pemesanan tiket
 const createTicket = async (req, h) => {
   try {
-    const { userId, destinationId, ticketQuantity } = req.payload;
+    const { userId, phone, destinationId, ticketQuantity } = req.payload;
 
     // Pastikan userId dan destinationId yang valid ada
     if (!userId || !destinationId || !ticketQuantity) {
@@ -23,6 +23,7 @@ const createTicket = async (req, h) => {
     // Membuat tiket baru
     const ticket = new Ticket({
       userId,
+      phone,
       destinationId,
       ticketQuantity,
     });
