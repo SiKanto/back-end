@@ -56,7 +56,7 @@ exports.loginAdmin = async (req, h) => {
     // Verifikasi password
     const isPasswordMatch = await admin.matchPassword(password);
     if (!isPasswordMatch) {
-      return h.response({ message: 'Invalid credentials' }).code(400);
+      return h.response({ message: 'Incorrect email or password.' }).code(400);
     }
 
     // Generate JWT token

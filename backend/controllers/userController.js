@@ -111,7 +111,7 @@ exports.loginUser = async (req, h) => {
     // Verifikasi password (Misalnya jika ada fitur hash untuk password)
     const isPasswordMatch = await user.matchPassword(password);
     if (!isPasswordMatch) {
-      return h.response({ message: 'Invalid credentials' }).code(400);
+      return h.response({ message: 'Incorrect email or password.' }).code(400);
     }
 
     // Generate JWT token
