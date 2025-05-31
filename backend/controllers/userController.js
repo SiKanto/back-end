@@ -9,6 +9,7 @@ exports.loginWithGoogle = async (request, h) => {
   try {
     const { token } = request.payload;
 
+    // Verifikasi token Google
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -18,16 +19,19 @@ exports.loginWithGoogle = async (request, h) => {
     const email = payload.email;
     const name = payload.name;
 
+    // Cek apakah pengguna sudah ada di database
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Buat user baru kalau belum ada
+      // Buat user baru jika tidak ada
       user = new User({
         email,
         username: name,
         password: null,
         role: 'user',
         status: 'Active',
+        firstName: payload.given_name || '', // Jika firstName tidak ada, gunakan nilai default
+        lastName: payload.family_name || '', // Jika lastName tidak ada, gunakan nilai default
       });
       await user.save();
     } else {
@@ -37,6 +41,7 @@ exports.loginWithGoogle = async (request, h) => {
       }
     }
 
+    // Membuat JWT token untuk login
     const jwtToken = jwt.sign(
       { id: user._id, email: user.email },
       process.env.SECRET_KEY,
