@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: false, // Hanya ada jika registrasi manual
-      default: null,
+      required: false,  // Password tidak diperlukan untuk login dengan Google
+      default: null,  // Set default null jika tidak ada password
     },
     status: {
       type: String,
@@ -39,13 +39,16 @@ const userSchema = new mongoose.Schema(
 
 // Menambahkan method untuk mencocokkan password
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  if (this.password) {
+    return await bcrypt.compare(enteredPassword, this.password);
+  }
+  return false; // Jika tidak ada password (seperti untuk login Google), return false
 };
 
 // Enkripsi password sebelum menyimpannya ke database
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
+  if (!this.isModified('password') || !this.password) {
+    return next(); // Jika password tidak dimodifikasi atau null, lewati enkripsi
   }
 
   this.password = await bcrypt.hash(this.password, 10);

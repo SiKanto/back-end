@@ -1,8 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const User = require('../models/user');
-
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 exports.loginWithGoogle = async (request, h) => {
@@ -26,12 +24,12 @@ exports.loginWithGoogle = async (request, h) => {
       // Buat user baru jika tidak ada
       user = new User({
         email,
-        username: name,
-        password: null,
+        username: name || email.split('@')[0],  // Jika nama tidak ada, gunakan bagian email sebelum '@' sebagai username
+        password: null,  // Tidak perlu password karena login menggunakan Google
         role: 'user',
         status: 'Active',
-        firstName: payload.given_name || '', // Jika firstName tidak ada, gunakan nilai default
-        lastName: payload.family_name || '', // Jika lastName tidak ada, gunakan nilai default
+        firstName: payload.given_name || '',  // Jika firstName tidak ada, gunakan nilai default
+        lastName: payload.family_name || '',  // Jika lastName tidak ada, gunakan nilai default
       });
       await user.save();
     } else {
