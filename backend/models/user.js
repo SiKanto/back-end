@@ -27,17 +27,6 @@ const userSchema = new mongoose.Schema(
       required: false, // Hanya ada jika registrasi manual
       default: null,
     },
-    phone: {
-      type: String,
-      required: false, // Boleh kosong, bisa diisi belakangan
-      default: null,
-      unique: true
-    },
-    address: {
-      type: String,
-      required: false,
-      default: null,
-    },
     status: {
       type: String,
       default: 'Active',
