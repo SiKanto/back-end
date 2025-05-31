@@ -1,4 +1,4 @@
-const { getAllUsers, updateUser, deleteUser, loginUser, registerUser, loginWithGoogle } = require('../controllers/userController');
+const { getAllUsers, updateUser, deleteUser, loginUser, registerUser, loginWithGoogle, checkUserEmail, resetUserPassword } = require('../controllers/userController');
 const { protectAdmin, protectUser } = require("../middleware/authMiddleware");
 
 const userRoutes = [
