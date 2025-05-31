@@ -71,12 +71,6 @@ exports.registerUser = async (req, h) => {
       return h.response({ message: 'User with this email already exists' }).code(400);
     }
 
-    // Cek apakah phone sudah ada
-    const existingPhone = await User.findOne({ phone });
-    if (existingPhone) {
-      return h.response({ message: 'Phone number already used' }).code(400);
-    }
-
     // Membuat user baru dan menyimpannya ke database
     const newUser = new User({
       firstName,
