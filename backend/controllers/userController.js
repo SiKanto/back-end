@@ -180,3 +180,42 @@ exports.deleteUser = async (req, h) => {
     return h.response({ message: 'Error deleting user', error: error.message }).code(500);
   }
 };
+
+// Cek apakah email ada untuk pengguna
+exports.checkUserEmail = async (req, h) => {
+  try {
+    const { email } = req.payload;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return h.response({ exists: false }).code(200); // Email tidak ditemukan
+    }
+
+    return h.response({ exists: true }).code(200); // Email ditemukan
+  } catch (error) {
+    console.error('Error details:', error);
+    return h.response({ message: 'Error checking email', error: error.message }).code(500);
+  }
+};
+
+// Reset password pengguna
+exports.resetUserPassword = async (req, h) => {
+  try {
+    const { email, newPassword } = req.payload;
+
+    // Cari pengguna berdasarkan email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return h.response({ message: 'User not found' }).code(404);
+    }
+
+    // Update password pengguna
+    user.password = newPassword;
+    await user.save();
+
+    return h.response({ message: 'Password reset successful' }).code(200);
+  } catch (error) {
+    console.error('Error details:', error);
+    return h.response({ message: 'Error resetting password', error: error.message }).code(500);
+  }
+};

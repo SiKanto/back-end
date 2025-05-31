@@ -23,6 +23,21 @@ const userRoutes = [
     handler: loginUser,
     options: {},
   },
+  // Route untuk memeriksa email pengguna (cek apakah email ada di database)
+  {
+    method: "POST",
+    path: "/users/check-email",
+    handler: checkUserEmail,
+    options: {},
+  },
+
+  // Route untuk mereset password pengguna
+  {
+    method: "POST",
+    path: "/users/reset-password",
+    handler: resetUserPassword,
+    options: {},
+  },
   // Mendapatkan semua user (Hanya admin yang bisa mengakses)
   {
     method: 'GET',
