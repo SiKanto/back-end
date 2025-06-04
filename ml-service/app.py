@@ -27,13 +27,13 @@ df = pd.read_excel('Dataset_Wisata_Madura.xlsx')  # dataset berisi info wisata
 # Tambahkan kolom default jika tidak ada, agar tidak error saat diakses
 required_columns = [
     'officialRating', 'rating', 'facilities', 'openingHours',
-    'closingHours', 'price', 'description', 'category', 'lat', 'lon', 'visitor'
+    'closingHours', 'price', 'description', 'category', 'lat', 'lon', 'visitor', 'imageURL'
 ]
 for col in required_columns:
     if col not in df.columns:
         if col in ['officialRating', 'rating', 'price', 'lat', 'lon', 'visitor']:
             df[col] = 0
-        elif col == 'facilities':
+        elif col == ['facilities', 'imageURL']:
             df[col] = ""
         else:
             df[col] = "-"
@@ -86,7 +86,8 @@ def predict():
         "officialRating": row['officialRating'],
         "rating": row['rating'],
         "lat": row['lat'],
-        "lon": row['lon']
+        "lon": row['lon'],
+        "imageURL": row['imageURL']
     } for index, row in recommended_data_sorted.iterrows()]
 
     return jsonify({
@@ -111,7 +112,8 @@ def get_all_destinations():
         "officialRating": row['officialRating'],
         "rating": row['rating'],
         "lat": row['lat'],
-        "lon": row['lon']
+        "lon": row['lon'],
+        "imageURL": row['imageURL']
     } for index, row in df.iterrows()]
 
     return jsonify({
