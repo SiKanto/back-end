@@ -58,6 +58,10 @@ const destinationSchema = new mongoose.Schema({
         type: Number,  // Longitude lokasi wisata
         required: true
     },
+    imageURL: {
+        type: String,  // Longitude lokasi wisata
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
