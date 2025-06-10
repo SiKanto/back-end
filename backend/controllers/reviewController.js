@@ -4,7 +4,8 @@ const Destination = require('../models/destination');
 // Menambahkan review baru
 exports.addReview = async (req, h) => {
   try {
-    const { userId, destinationId, rating, comment } = req.payload;  // Ganti req.body menjadi req.payload
+    const userId = decoded.userId;
+    const { destinationId, rating, comment } = req.payload;  // Ganti req.body menjadi req.payload
 
     // Validasi apakah destinasi ada
     const destination = await Destination.findById(destinationId);
