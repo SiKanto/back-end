@@ -134,6 +134,20 @@ exports.getAllUsers = async (req, h) => {
   }
 };
 
+exports.getUserById = async (req, h) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return h.response({ message: 'User not found' }).code(404);
+    }
+    return h.response(user).code(200);  // Kembalikan data user
+  } catch (error) {
+    console.error('Error fetching user:', error);  // Log error untuk debugging
+    return h.response({ message: 'Error fetching user', error: error.message }).code(500);
+  }
+};
+
+
 // Update user data atau status (termasuk phone & address)
 exports.updateUser = async (req, h) => {
   try {

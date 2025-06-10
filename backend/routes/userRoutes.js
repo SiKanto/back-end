@@ -1,4 +1,4 @@
-const { getAllUsers, updateUser, deleteUser, loginUser, registerUser, loginWithGoogle, checkUserEmail, resetUserPassword } = require('../controllers/userController');
+const { getAllUsers, updateUser, deleteUser, loginUser, registerUser, loginWithGoogle, checkUserEmail, resetUserPassword, getUserById } = require('../controllers/userController');
 const { protectAdmin, protectUser } = require("../middleware/authMiddleware");
 
 const userRoutes = [
@@ -43,6 +43,14 @@ const userRoutes = [
     method: 'GET',
     path: '/users',
     handler: getAllUsers,
+    options: {
+      pre: [protectAdmin], // Proteksi admin
+    },
+  },
+  {
+    method: 'GET',
+    path: '/user/{id}',
+    handler: getUserById,
     options: {
       pre: [protectAdmin], // Proteksi admin
     },
