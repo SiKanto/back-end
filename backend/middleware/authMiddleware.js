@@ -39,29 +39,38 @@ const protectAdmin = async (request, h) => {
 };
 
 const protectUser = {
-    assign: "credentials", // ini penting agar bisa dipakai di req.auth.credentials
+    assign: "credentials", // penting
     method: async (request, h) => {
         try {
             const authHeader = request.headers.authorization;
 
             if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                return h
-                    .response({ message: "Unauthorized: No token provided" })
-                    .code(401);
+                throw new Error("Unauthorized: No token provided");
             }
 
             const token = authHeader.split(" ")[1];
-            const decoded = jwt.verify(token, process.env.SECRET_KEY); // Ganti dengan kunci rahasia kamu
+            const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-            return { userId: decoded.id }; // akan disimpan di request.auth.credentials
+            // SIMPAN KE request.auth.credentials secara eksplisit
+            request.auth = {
+                credentials: {
+                    userId: decoded.id, // sesuai dengan yang kamu pakai
+                    email: decoded.email, // opsional
+                    role: decoded.role,   // opsional
+                },
+            };
+
+            return h.continue;
         } catch (error) {
             console.error("JWT Error:", error);
             return h
                 .response({ message: "Unauthorized: Invalid token" })
-                .code(401);
+                .code(401)
+                .takeover(); // penting agar berhenti di sini
         }
     },
 };
+
 
 // Hanya satu ekspor yang benar
 module.exports = { protectAdmin, protectUser };
