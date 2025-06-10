@@ -1,74 +1,76 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Schema untuk destinasi wisata
 const destinationSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     location: {
         type: String,
-        required: true
+        required: true,
     },
-    facilities: [{
-        type: String,  // Daftar fasilitas seperti toilet, parkir, dll.
-    }],
+    facilities: [
+        {
+            type: String, // Daftar fasilitas seperti toilet, parkir, dll.
+        },
+    ],
     price: {
-        type: Number,  // Harga tiket atau biaya masuk
-        required: true
+        type: Number, // Harga tiket atau biaya masuk
+        required: true,
     },
     openingHours: {
-        type: String,  // Jam buka
-        required: true
+        type: String, // Jam buka
+        required: true,
     },
     closingHours: {
-        type: String,  // Jam tutup
-        required: true
+        type: String, // Jam tutup
+        required: true,
     },
     description: {
-        type: String,  // Deskripsi wisata
-        required: true
+        type: String, // Deskripsi wisata
+        required: true,
     },
     visitor: {
-      type: Number,
-      default: 0
+        type: Number,
+        default: 0,
     },
     category: {
-      type: String,  // Jam tutup
-      required: true
+        type: String, // Jam tutup
+        required: true,
     },
     city: {
-        type: String,  // Asal kota
-        required: true
+        type: String, // Asal kota
+        required: true,
     },
     officialRating: {
-        type: Number,  // Rating resmi dari Kementerian Pariwisata (Jika ada)
-        default: 0,    // Default rating jika belum ada review
+        type: Number, // Rating resmi dari Kementerian Pariwisata (Jika ada)
+        default: 0, // Default rating jika belum ada review
     },
     rating: {
-        type: Number,  // Rating rata-rata dari pengunjung (dinamis, dihitung berdasarkan review)
-        default: 0,    // Nilai default jika belum ada review
+        type: Number, // Rating rata-rata dari pengunjung (dinamis, dihitung berdasarkan review)
+        default: 0, // Nilai default jika belum ada review
     },
     lat: {
-        type: Number,  // Latitude lokasi wisata
-        required: true
+        type: Number, // Latitude lokasi wisata
+        required: true,
     },
     lon: {
-        type: Number,  // Longitude lokasi wisata
-        required: true
+        type: Number, // Longitude lokasi wisata
+        required: true,
     },
     imageURL: {
-        type: String,  // Longitude lokasi wisata
-        required: true
+        type: String, // Longitude lokasi wisata
+        required: true,
     },
     createdAt: {
         type: Date,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 });
 
 // Model untuk destinasi wisata
-const Destination = mongoose.model('Destination', destinationSchema);
+const Destination = mongoose.model("Destination", destinationSchema);
 
 module.exports = Destination;
