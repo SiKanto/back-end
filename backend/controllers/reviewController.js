@@ -4,29 +4,21 @@ const Destination = require("../models/destination");
 // Menambahkan review baru
 exports.addReview = async (req, h) => {
     try {
-        const userId = req.auth.credentials.userId;
-        const { destinationId, rating, comment } = req.payload;
+        const { userId, destinationId, rating, comment } = req.payload;
 
-        // ✅ Validasi input
-        if (!comment || comment.trim() === "") {
-            return h.response({ message: "Comment is required" }).code(400);
+        if (!userId || !comment || !destinationId) {
+            return h.response({ message: "Missing required fields" }).code(400);
         }
 
         if (typeof rating !== "number" || rating < 1 || rating > 5) {
-            return h
-                .response({
-                    message: "Rating must be a number between 1 and 5",
-                })
-                .code(400);
+            return h.response({ message: "Invalid rating" }).code(400);
         }
 
-        // ✅ Cek apakah destinasi ada
         const destination = await Destination.findById(destinationId);
         if (!destination) {
             return h.response({ message: "Destination not found" }).code(404);
         }
 
-        // ✅ Simpan review baru
         const newReview = new Review({
             userId,
             destinationId,
@@ -36,21 +28,12 @@ exports.addReview = async (req, h) => {
 
         await newReview.save();
 
-        // ✅ Hitung ulang average rating setelah review masuk
+        // Hitung ulang average rating
         const reviews = await Review.find({ destinationId });
+        const averageRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
-        let averageRating = 0;
-        if (reviews.length > 0) {
-            averageRating =
-                reviews.reduce((sum, review) => sum + review.rating, 0) /
-                reviews.length;
-        }
+        await Destination.findByIdAndUpdate(destinationId, { rating: averageRating });
 
-        await Destination.findByIdAndUpdate(destination._id, {
-            rating: averageRating,
-        });
-
-        // ✅ Kirim respons
         return h.response(newReview).code(201);
     } catch (error) {
         console.error("Error adding review:", error);
