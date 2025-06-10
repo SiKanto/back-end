@@ -31,21 +31,27 @@ const protectAdmin = async (request, h) => {
   }
 };
 
-// Middleware untuk proteksi User
-const protectUser = async (request, h) => {
-  // Cek apakah request.auth.credentials ada
-  if (!request.auth.credentials) {
-    return h.response({ message: 'Unauthorized: No credentials found' }).code(401); // 401 Unauthorized
+const protectUser = {
+  assign: 'credentials', // ini penting agar bisa dipakai di req.auth.credentials
+  method: async (request, h) => {
+    try {
+      const authHeader = request.headers.authorization;
+
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return h.response({ message: "Unauthorized: No token provided" }).code(401);
+      }
+
+      const token = authHeader.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.SECRET_KEY); // Ganti dengan kunci rahasia kamu
+
+      return { userId: decoded.id }; // akan disimpan di request.auth.credentials
+    } catch (error) {
+      console.error("JWT Error:", error);
+      return h.response({ message: "Unauthorized: Invalid token" }).code(401);
+    }
   }
-
-  const { userId } = request.params;  // Mengambil userId dari parameter URL
-
-  if (request.auth.credentials.id !== userId) {
-    return h.response({ message: 'Unauthorized: You cannot access other user\'s data' }).code(403); // 403 Forbidden
-  }
-
-  return h.continue; // Lanjutkan ke handler berikutnya
 };
+
 
 // Hanya satu ekspor yang benar
 module.exports = { protectAdmin, protectUser };
