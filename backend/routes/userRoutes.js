@@ -52,7 +52,7 @@ const userRoutes = [
     path: '/user/{id}',
     handler: getUserById,
     options: {
-      pre: [protectAdmin], // Proteksi admin
+      pre: [],
     },
   },
   // Update data user (Hanya admin yang bisa mengakses)
