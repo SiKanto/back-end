@@ -88,36 +88,6 @@ You can use **Postman** to test your backend API endpoints.
 4. In the body, include the data to be sent to the API.
 5. Send the request and check the response.
 
-**Example**:  
-To test an API endpoint for predicting a result using the ML model:
-- URL: `/api/predict`
-- Method: `POST`
-- Body:
-```json
-{
-  "data": [1.2, 3.4, 5.6]
-}
-```
-
-## Usage
-
-Once the backend is running, you can use the API endpoints to interact with the machine learning model.
-
-For example:
-- **GET** `/api/predict`: Makes a prediction based on provided data.
-
-### Example Request
-```bash
-curl -X POST http://localhost:3000/api/predict -H "Content-Type: application/json" -d '{"data": [1.2, 3.4, 5.6]}'
-```
-
-### Example Response
-```json
-{
-  "prediction": 0.89
-}
-```
-
 ## Contribution
 
 We welcome contributions! If you'd like to contribute to the development of this project, please fork the repository, make your changes, and submit a pull request.
