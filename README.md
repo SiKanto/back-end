@@ -1,4 +1,3 @@
-
 # Backend System with Node.js, Hapi, TensorFlow, and Machine Learning Model Integration
 
 This repository contains the backend system for our application, built using **Node.js**, **Hapi.js Framework**, and **TensorFlow**. It is designed to integrate and serve machine learning models, specifically utilizing TensorFlow for making predictions.
@@ -94,4 +93,4 @@ We welcome contributions! If you'd like to contribute to the development of this
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Tim Kanto @CodingCamp25
