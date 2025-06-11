@@ -60,8 +60,8 @@ To get started with the backend project, follow these installation steps:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/your-repository.git
-   cd your-repository
+   git clone https://github.com/your-username/back-end.git
+   cd back-end
    ```
 
 2. **Install dependencies**:
@@ -90,7 +90,7 @@ You can use **Postman** to test your backend API endpoints.
 
 **Example**:  
 To test an API endpoint for predicting a result using the ML model:
-- URL: `http://localhost:3000/api/predict`
+- URL: `/api/predict`
 - Method: `POST`
 - Body:
 ```json
